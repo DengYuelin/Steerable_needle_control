@@ -1,6 +1,6 @@
 clc, clear, close all
 %% Constants
-experiments = 1000;
+experiments = 5000;
 const.dt = 0.05;
 const.MAXITER = 5e4;
 
@@ -9,7 +9,7 @@ curvature_list = rand(1, experiments) * 19 + 1;
 ratio_list = rand(1, experiments) * 99 + 1;
 goal_list = zeros(3, experiments);
 goal_list(2, :) = rand(1, experiments) .* (-2 ./ curvature_list);
-goal_list(3, :) = rand(1, experiments) .* (2 ./ curvature_list) + (1 ./ curvature_list);
+goal_list(3, :) = rand(1, experiments) .* (2 ./ curvature_list);
 
 error_hist = zeros(experiments, 1);
 
@@ -29,6 +29,10 @@ for i = 1:1000
     qbar = sqrt(1 + lambdabar(i)^2);
     upper_bound(i) = lambdabar(i) / qbar^3 + (4 * pi * lambdabar(i)^3 + 2 * lambdabar(i)) / (qbar^3 * (lambdabar(i)^2 - 1));
 end
+
+index=isnan(error_hist);
+error_hist(index) = [];
+ratio_list(index) = [];
 
 figure(1)
 loglog(lambdabar, upper_bound, 'DisplayName', 'Theoretical Upper Bound')

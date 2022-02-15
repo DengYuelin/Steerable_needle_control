@@ -17,13 +17,14 @@ function final_error = simulate(setup, const)
     %% Check if goal satisfy initial condition
     % Verify goal position satisfy torus condition
     if ~checkReachability(R0, p0, goal, k)
-        disp("Torus condition NOT satisfied!")
+%         disp("Torus condition NOT satisfied!")
+        final_error = NaN;
         return
     end
 
     et = getErrorVec(R0, p0, goal);
 
-    if ~(et(1) == 0 && (et(2) >= -2 / k && et(2) <= 0) && (et(3) >= 0)) %&& et(3) <= 2 / k)
+    if ~(et(1) == 0 && (et(2) >= -2 / k && et(2) <= 0) && (et(3) >= 0 && et(3) <= 2 / k)) 
         disp("Initial goal condition NOT satisfied!")
         return
     end
