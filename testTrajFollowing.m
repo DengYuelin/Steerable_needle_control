@@ -27,6 +27,15 @@ for i = 1:size(tspan, 2)
     Pd(3, i) = (RefTraj.A - RefTraj.a * t) * sin(RefTraj.w * t);
 end
 
+%% Find cut off point
+for i = 2:size(tspan, 2) - 1
+    [~,rad,~,~] = circlefit3d(Pd(:,i-1)',Pd(:,i)',Pd(:,i+1)');
+    if rad < 1/k
+        cutoff = tspan(i);
+        break
+    end
+end
+
 %% start control simulation
 pt = p0;
 Rt = R0;
@@ -39,6 +48,7 @@ Rlimit.theta = 0;
 for i = 1:size(tspan, 2) - 1
     t = tspan(i);
     et = getErrorVec(Rt, pt, Pd(:, i + 1));
+
     [sigma, sigma_sign] = getManifold(et);
 
     traj.pdot = norm([(-RefTraj.w * (RefTraj.A - RefTraj.a * t) * sin(RefTraj.w * t) - RefTraj.a * cos(RefTraj.w * t));
@@ -67,21 +77,23 @@ end
 
 %% Plot the trajectory
 figure(1)
-plot(Pd(1, :), Pd(3, :), 'ro')
+subplot(2, 2, 1)
+plot(Pd(1, :), Pd(3, :), 'ro', 'DisplayName', 'Desired Needle Trajectory')
 grid on
 hold on
-plot(Hist.position(1, :), Hist.position(3, :), 'b-', 'LineWidth', 2)
+plot(Hist.position(1, :), Hist.position(3, :), 'b-', 'LineWidth', 2, 'DisplayName', 'Simulated Trajectory')
 set(gca, 'FontSize', 16)
 set(gcf, 'position', [100, 100, 700, 700])
-
-figure(2)
+xlabel('x (m)');
+ylabel('z (m)');
+legend('interpreter', 'latex', 'location', 'northoutside');
+subplot(2, 2, 2)
 plot(Pd(2, :), Pd(3, :), 'ro')
 grid on
 hold on
 plot(Hist.position(2, :), Hist.position(3, :), 'b-', 'LineWidth', 2)
-set(gca, 'FontSize', 16)
-set(gcf, 'position', [100, 100, 700, 700])
-
+xlabel('y (m)');
+ylabel('z (m)');
 % figure(3)
 % plot3(Pd(1, :), Pd(2, :), Pd(3, :))
 % grid on
@@ -89,6 +101,18 @@ set(gcf, 'position', [100, 100, 700, 700])
 % ylabel('y');
 % zlabel('z');
 %%
-figure(4)
-plot(tspan(1:end - 1), Hist.error)
+subplot(2, 2, [3 4])
+plot(tspan(1:end - 1), Hist.error, 'LineWidth', 2, 'DisplayName', 'Trajectory Trackin Error')
 set(gca, 'YScale', 'log')
+lambdabar = lambda2 / (k * lambda1);
+qbar = sqrt(1 + lambdabar^2);
+upper_bound = lambdabar / qbar^3 + (4 * pi * lambdabar^3 + 2 * lambdabar) / (qbar^3 * (lambdabar^2 - 1));
+hold on
+yline(upper_bound, 'r', 'LineWidth', 2, 'DisplayName', 'Error Bound for Stationary Targets')
+xline(cutoff, '--', 'LineWidth', 2, 'DisplayName', 'Desired Trajectory Cuvature Becomes Larger than Physical Needle Curvature')
+xlabel('t (s)');
+ylabel('m');
+legend('interpreter', 'latex', 'location', 'northwest');
+grid on
+set(gca, 'FontSize', 16)
+set(gcf, 'position', [100, 100, 1200, 1200])
