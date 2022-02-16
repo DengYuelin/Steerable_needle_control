@@ -59,9 +59,9 @@ while true
 
     % check error and manifold
     et = getErrorVec(Rt, pt, goal);
-    [~, sigma_sign] = getManifold(et);
+    [sigma, sigma_sign] = getManifold(et);
     % get control signal
-    ut = getControl(lambda1, lambda2, sigma_sign);
+    ut = getControl(lambda1, lambda2, sigma);
 
     if (~reached_tau) && getTimeConstant(et, ut, const_q, k, current_time)
         reached_tau = true;

@@ -17,14 +17,14 @@ function final_error = simulate(setup, const)
     %% Check if goal satisfy initial condition
     % Verify goal position satisfy torus condition
     if ~checkReachability(R0, p0, goal, k)
-%         disp("Torus condition NOT satisfied!")
+        %         disp("Torus condition NOT satisfied!")
         final_error = NaN;
         return
     end
 
     et = getErrorVec(R0, p0, goal);
 
-    if ~(et(1) == 0 && (et(2) >= -2 / k && et(2) <= 0) && (et(3) >= 0 && et(3) <= 2 / k)) 
+    if ~(et(1) == 0 && (et(2) >= -2 / k && et(2) <= 0) && (et(3) >= 0 && et(3) <= 2 / k))
         disp("Initial goal condition NOT satisfied!")
         return
     end
@@ -41,9 +41,9 @@ function final_error = simulate(setup, const)
 
         % check error and manifold
         et = getErrorVec(Rt, pt, goal);
-        [~, sigma_sign] = getManifold(et);
+        [sigma, sigma_sign] = getManifold(et);
         % get control signal
-        ut = getControl(lambda1, lambda2, sigma_sign);
+        ut = getControl(lambda1, lambda2, sigma);
         % Simulate one step dynamics
         [Rnext, pnext] = dynamics_dt(Rt, pt, ut, k, dt);
 

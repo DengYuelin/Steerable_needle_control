@@ -30,7 +30,7 @@ for i = 1:1000
     upper_bound(i) = lambdabar(i) / qbar^3 + (4 * pi * lambdabar(i)^3 + 2 * lambdabar(i)) / (qbar^3 * (lambdabar(i)^2 - 1));
 end
 
-index=isnan(error_hist);
+index = isnan(error_hist);
 error_hist(index) = [];
 ratio_list(index) = [];
 
